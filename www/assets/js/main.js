@@ -28,6 +28,7 @@ var appView = Backbone.View.extend({
     templates: {
         web: _.template($('#webTpl').html()),
         msg: _.template($('#msgTpl').html()),
+        log: _.template($('#logTpl').html()),
         pyd: _.template($('#payloadTpl').html())
     },
     events: {
@@ -529,11 +530,21 @@ var appView = Backbone.View.extend({
             data: {
                 task:'logs',
                 token:this.webToken
-            }
+            },
+            dataType: 'text',  // 指定响应数据类型为文本
         }).then(function(response){
             $.modal.close();
-            self.$el.html(self.templates.pyd(response));
+            // 去掉所有 \n
+            var cleanText = response.replace(/\\n|\n|\r\n|\r/g, '</br>');
+            // 或者更简单的方式
+            //cleanText = cleanText.replace(/\s*\n\s*/g, ' ');
+
+            // 进一步清理多余空格
+            //cleanText = cleanText.replace(/\s+/g, ' ').trim();
+            //console.log(response)
+            self.$el.html(self.templates.log({"logText":cleanText}));
         }).catch(function(err){
+            console.log(err)
             if(err.responseJSON){
                 $.modal.content(self.templates.msg({message: err.responseJSON.output, buttons:[]}));
             }else{

@@ -420,21 +420,11 @@ case "$task" in
     ;;
     "logs")
 
-        echo "Content-Type: application/json"
+        echo "Content-Type: pain/text"
         echo ""
         
-        echo "{"
-        echo "\"log_lines\":["
-        
-        # 执行logread命令并处理输出
-        logread -e pppwn | while IFS= read -r line; do
-            # 转义JSON特殊字符
-            escaped_line=$(echo "$line" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g; s/\r/\\r/g; s/\n/\\n/g')
-            echo "\"$escaped_line\","
-        done | sed '$s/,$//'  # 移除最后一个逗号
-        
-        echo "]"
-        echo "}"
+        # 执行logread命令并转义输出
+        logread -e pppwn | sed 's/\\/\\\\/g; s/"/\\"/g; s/$/\\n/' | tr -d '</br>'
 
         exit 0
 
