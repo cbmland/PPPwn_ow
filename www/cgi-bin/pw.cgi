@@ -424,7 +424,7 @@ case "$task" in
         echo ""
         
         # 执行logread命令并转义输出
-        logread -e pppwn | tail -n 200 | sed 's/\\/\\\\/g; s/"/\\"/g; s/$/\\n/' | tr -d ''
+        logread -e pppwn | tail -n 200 | sed 's/\\/\\\\/g; s/"/\\"/g' | tr -d ''
 
         exit 0
 

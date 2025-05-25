@@ -602,3 +602,7 @@ var SectionRouter = Backbone.Router.extend({
 
 var sectionRouter = new SectionRouter();
 Backbone.history.start();
+
+$(document).on('click', '#refresh_log', function() {
+    appweb.logs();
+});
