@@ -35,15 +35,24 @@ start() {
         sleep 5
         ip link set $interface up
 
-        result=$(pppwn --interface "$interface" --fw "$version" --stage1 "$stage1" --stage2 "$stage2" --timeout $timeout $sleep $retry)
+        # 记录开始执行到系统日志
+        logger -t pppwn "Starting pppwn with interface: $interface, version: $version"
+        
+        # 执行pppwn并将输出同时发送到系统日志
+        result=$(pppwn --interface "$interface" --fw "$version" --stage1 "$stage1" --stage2 "$stage2" --timeout $timeout $sleep $retry 2>&1 | while IFS= read -r line; do
+            logger -t pppwn "$line"
+            echo "$line"
+        done)
 
         if [[ "$result" == *"\[\+\] Done\!"* ]]; then
+            logger -t pppwn "pppwn execution completed successfully"
             if ! pgrep pppoe-server > /dev/null; then
                 /etc/init.d/pppoe-server start
                 sleep 3
             fi
             exit 0
         else
+            logger -t pppwn "pppwn execution failed"
             if ! pgrep pppoe-server > /dev/null; then
                 /etc/init.d/pppoe-server start
                 sleep 3

@@ -28,6 +28,7 @@ var appView = Backbone.View.extend({
     templates: {
         web: _.template($('#webTpl').html()),
         msg: _.template($('#msgTpl').html()),
+        log: _.template($('#logTpl').html()),
         pyd: _.template($('#payloadTpl').html())
     },
     events: {
@@ -507,7 +508,7 @@ var appView = Backbone.View.extend({
             var circle = $(iterator).find('.push-circle');
             if($(iterator).val() == 'yes'){
                 circle.css(on.color).css(on.align);
-            }else{
+        }else{
                 circle.css(off.color).css(off.align);
             }
             $(iterator).click(function(){
@@ -538,6 +539,39 @@ var appView = Backbone.View.extend({
         this.loading = this.$('#loading_ide');
         this.state();
         this.listenTo(this.model, 'change', this.render);
+
+    },
+    logs: function(){
+
+        var self = this;
+
+        $.modal(function(modal){
+            modal.content($('<div class="preloader center"></div>'));
+        });
+        $.modal.close();
+        this.model.fetch({
+            method: 'POST',
+            data: {
+                task:'logs',
+                token:this.webToken
+            },
+            dataType: 'text',  // 指定响应数据类型为文本
+        }).then(function(response){
+            $.modal.close();
+            var cleanText = response;
+            self.$el.html(self.templates.log({"logText":cleanText}));
+            
+            // 添加自动滚动到底部的功能
+            var logContainer = $('.logText');
+            logContainer.scrollTop(logContainer[0].scrollHeight);
+        }).catch(function(err){
+            console.log(err)
+            if(err.responseJSON){
+                $.modal.content(self.templates.msg({message: err.responseJSON.output, buttons:[]}));
+            }else{
+                $.modal.content(self.templates.msg({message: err.responseText, buttons:[]}));
+            }
+        });
 
     },
     payloads: function(){
@@ -580,9 +614,16 @@ var SectionRouter = Backbone.Router.extend({
         },
         'payloads': function(){
             appweb.payloads();
+        },
+        'logs': function(){
+            appweb.logs();
         }
     }
 });
 
 var sectionRouter = new SectionRouter();
 Backbone.history.start();
+
+$(document).on('click', '#refresh_log', function() {
+    appweb.logs();
+});

@@ -417,6 +417,17 @@ case "$task" in
         exit 0
 
     ;;
+    "logs")
+
+        echo "Content-Type: pain/text"
+        echo ""
+        
+        # 执行logread命令并转义输出
+        logread -e pppwn | tail -n 200 | sed 's/\\/\\\\/g; s/"/\\"/g' | tr -d ''
+
+        exit 0
+
+    ;;
     *)
 
         echo "Status: 400 Bad Request"

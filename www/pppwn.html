@@ -18,6 +18,7 @@
                         <ul class="menu">
                             <li><a href="">PPPWN</a></li>
                             <li><a href="#/payloads">Payloads</a></li>
+                            <li><a href="#/logs">Logs</a></li>
                         </ul>
                     </div>
                 </div>
@@ -42,29 +43,26 @@
                                         <div class="row">
                                             <div class="col-4">
                                                 <div class="top-label"><label for="inputAutorun" title="Enable auto executable">Auto Run</label></div>
-                                                <div class="sec-auto box">
-                                                    <button type="button" class="input-switch" name="auto-run" id="switch_pw">
-                                                        <div class="push-circle"></div>
-                                                    </button>
-                                                </div>
+                                                <select name="auto-run" id="switch_pw" class="sec-auto box">
+                                                    <option <% if(autorun){ %>selected <% } %>value="1">On</option>
+                                                    <option <% if(!autorun){ %>selected <% } %>value="0">Off</option>
+                                                </select>
                                             </div>
                                             <div class="col-4">
                                                 <div class="top-label"><label for="inputAutoretry" title="Enable auto executable">Auto Retry</label></div>
-                                                <div class="sec-auto box">
-                                                    <button type="button" class="input-switch" name="auto-retry" id="retry_pw">
-                                                        <div class="push-circle"></div>
-                                                    </button>
-                                                </div>
+                                                <select name="auto-retry" id="retry_pw" class="sec-auto box">
+                                                    <option <% if(retry){ %>selected <% } %>value="yes">On</option>
+                                                    <option <% if(!retry){ %>selected <% } %>value="no">Off</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-4">
                                                 <div class="top-label"><label for="inputRealsleep" title="Enable auto executable">Real Sleep</label></div>
-                                                <div class="sec-auto box">
-                                                    <button type="button" class="input-switch" name="real-sleep" id="sleep_pw">
-                                                        <div class="push-circle"></div>
-                                                    </button>
-                                                </div>
+                                                <select name="real-sleep" id="sleep_pw" class="sec-auto box">
+                                                    <option <% if(sleep){ %>selected <% } %>value="yes">On</option>
+                                                    <option <% if(!sleep){ %>selected <% } %>value="no">Off</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -172,11 +170,34 @@
                         </fieldset>
                     </form>
                 </script>
+                <script type="text/template" id="logTpl">
+                    <div class="log-container">
+                        <div class="log-header">
+                            <button type="button" id="refresh_log" class="btn-form" style="margin-bottom: 10px; padding: 8px 20px; font-size: 14px;">Refresh</button>
+                        </div>
+                        <div class="logText" style="
+                        font-size: small;
+                        overflow: auto;
+                        height: 80vh;
+                        color: #333;
+                        padding: 1em;
+                        background: #f5f5f5;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                        white-space: pre-wrap;
+                        word-wrap: break-word;
+                        user-select: text;
+                        -webkit-user-select: text;
+                        -moz-user-select: text;
+                        -ms-user-select: text;
+                    "><%= logText %></div>
+                    </div>
+                </script>
             </div>
         </div>
         <div class="container">
             <div id="footer" class="content">
-                <sub><a target="_blank" href="https://codeinvers3.netlify.app/#donate">Donate</a></sub>
+                <sub><a target="_blank" href="https://ko-fi.com/invers3">Support me</a></sub>
                 <sub> | </sub>
                 <sub><a id="credits" href="#credits">Credits</a></sub>
                 <sub> | </sub>
