@@ -171,13 +171,22 @@
                     </form>
                 </script>
                 <script type="text/template" id="logTpl">
-                    <pre class="logText" style="
+                    <div class="logText" style="
                     font-size: small;
-                    overflow: scroll;
+                    overflow: auto;
                     height: 80vh;
                     color: #333;
                     padding: 1em;
-                "><%= logText %></pre>
+                    background: #f5f5f5;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    user-select: text;
+                    -webkit-user-select: text;
+                    -moz-user-select: text;
+                    -ms-user-select: text;
+                "><%= logText %></div>
                 </script>
             </div>
         </div>
