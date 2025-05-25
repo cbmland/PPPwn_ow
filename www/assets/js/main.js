@@ -534,15 +534,12 @@ var appView = Backbone.View.extend({
             dataType: 'text',  // 指定响应数据类型为文本
         }).then(function(response){
             $.modal.close();
-            // 去掉所有 \n
-            var cleanText = response;//response.replace(/\\n|\n|\r\n|\r/g, '</br>');
-            // 或者更简单的方式
-            //cleanText = cleanText.replace(/\s*\n\s*/g, ' ');
-
-            // 进一步清理多余空格
-            // cleanText = cleanText.replace(/\s+/g, ' ').trim();
-            //console.log(response)
+            var cleanText = response;
             self.$el.html(self.templates.log({"logText":cleanText}));
+            
+            // 添加自动滚动到底部的功能
+            var logContainer = $('.logText');
+            logContainer.scrollTop(logContainer[0].scrollHeight);
         }).catch(function(err){
             console.log(err)
             if(err.responseJSON){
