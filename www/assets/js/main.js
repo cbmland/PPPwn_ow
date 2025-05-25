@@ -535,12 +535,12 @@ var appView = Backbone.View.extend({
         }).then(function(response){
             $.modal.close();
             // 去掉所有 \n
-            var cleanText = response.replace(/\\n|\n|\r\n|\r/g, '</br>');
+            var cleanText = response;//response.replace(/\\n|\n|\r\n|\r/g, '</br>');
             // 或者更简单的方式
             //cleanText = cleanText.replace(/\s*\n\s*/g, ' ');
 
             // 进一步清理多余空格
-            //cleanText = cleanText.replace(/\s+/g, ' ').trim();
+            // cleanText = cleanText.replace(/\s+/g, ' ').trim();
             //console.log(response)
             self.$el.html(self.templates.log({"logText":cleanText}));
         }).catch(function(err){
