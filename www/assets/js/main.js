@@ -516,6 +516,32 @@ var appView = Backbone.View.extend({
         this.listenTo(this.model, 'change', this.render);
 
     },
+    logs: function(){
+
+        var self = this;
+
+        $.modal(function(modal){
+            modal.content($('<div class="preloader center"></div>'));
+        });
+        $.modal.close();
+        this.model.fetch({
+            method: 'POST',
+            data: {
+                task:'logs',
+                token:this.webToken
+            }
+        }).then(function(response){
+            $.modal.close();
+            self.$el.html(self.templates.pyd(response));
+        }).catch(function(err){
+            if(err.responseJSON){
+                $.modal.content(self.templates.msg({message: err.responseJSON.output, buttons:[]}));
+            }else{
+                $.modal.content(self.templates.msg({message: err.responseText, buttons:[]}));
+            }
+        });
+
+    },
     payloads: function(){
 
         var self = this;
@@ -556,6 +582,9 @@ var SectionRouter = Backbone.Router.extend({
         },
         'payloads': function(){
             appweb.payloads();
+        },
+        'logs': function(){
+            appweb.logs();
         }
     }
 });

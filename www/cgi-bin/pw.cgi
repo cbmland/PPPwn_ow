@@ -418,6 +418,27 @@ case "$task" in
         exit 0
 
     ;;
+    "logs")
+
+        echo "Content-Type: application/json"
+        echo ""
+        
+        echo "{"
+        echo "\"log_lines\":["
+        
+        # 执行logread命令并处理输出
+        logread -e pppwn | while IFS= read -r line; do
+            # 转义JSON特殊字符
+            escaped_line=$(echo "$line" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g; s/\r/\\r/g; s/\n/\\n/g')
+            echo "\"$escaped_line\","
+        done | sed '$s/,$//'  # 移除最后一个逗号
+        
+        echo "]"
+        echo "}"
+
+        exit 0
+
+    ;;
     *)
 
         echo "Status: 400 Bad Request"
