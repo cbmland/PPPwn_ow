@@ -1,0 +1,279 @@
+/*
+ * Custom style
+ */
+
+body{
+	font-family: Arial;
+	color: #000000;
+	background-color: #090a76c5;
+	background-image: url(https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/images/playstation/pstore-top-1.png);
+	background-position: left top;
+	background-repeat: no-repeat;
+	font-size: 18px;
+}
+
+#appWeb, #footer, #header{
+	max-width: 750px;
+	background-color: #ffffffa1;
+	color: #fcec8f;
+}
+
+#appWeb fieldset{
+	color: #0c2378;
+	background-color: #f1fbff88;
+	border:none;
+}
+
+#header{
+	background: #ffffff63;
+	text-transform: uppercase;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#header h1{
+	color: hsl(146, 100%, 97%);
+	text-shadow: #1b1b1b 1px 4px 4px;
+}
+
+#header .top-title{
+	line-height: 60px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+#header .menu{
+	padding: 10px;
+}
+
+#header .menu li{
+	padding: 20px;
+	font-weight: bolder;
+}
+
+.btn-form{
+	background-color: #0c2378 !important;
+	color: aliceblue !important;
+	border-color: #e3e9ff !important;
+}
+
+.btn-form:focus{
+	background-color: rgb(21, 109, 234) !important;
+}
+
+.group-center{
+	display: block;
+	margin-left: auto;
+	position: relative;
+}
+
+#task-log{
+	width: 100%;
+	padding: 15px;
+}
+
+#task-log .output{
+	border-radius: 10px;
+	background-color: #1b1b1b;
+	padding: 10px;
+	color: #FFF;
+	height: 150px;
+	width: 100%;
+	font-size: 10pt;
+}
+
+.form{
+	color: #1b1b1b;
+}
+
+.form .top-label{
+	width: 100px;
+}
+
+.form input, .form select{
+	background-color: #0c2378;
+	color: #FFF;
+}
+
+.form .field-group .input-attach{
+	padding: 15px;
+	font-size: 9pt;
+	font-weight: 200;
+	text-transform: uppercase;
+}
+
+.form .expand-slc .op-selected{
+	background-color: #000000;
+	color: #FFF;
+}
+
+/* Custom buttons */
+.box-button{
+	display: block;
+	background-color: #1eb4c2;
+	width: 40px;
+	height: 30px;
+	position: relative;
+}
+
+.box-button .btn-switch{
+	padding: 10px !important;
+	width: 15px;
+	margin: 0px;
+	height: 15px;
+}
+
+.sent-payload{
+	margin-top: 5px;
+	margin-bottom: 5px;
+	background-color: #0c2378;
+	color: #FFF;
+}
+
+/* Message */
+.dialog-box{
+	background-color: #FFF;
+	position: relative;
+	padding: 20px;
+	font-size: 9pt;
+	width: 90%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.message-success{
+	background-color: #32a72e;
+	color:#1b1b1b;
+	position: relative;
+	display: block;
+}
+
+#footer{
+	padding: 20px;
+}
+
+#footer a{
+	color: rgb(101, 44, 248);
+}
+
+.expand-slc{
+	width: 80%;
+}
+
+/* Modal */
+.modal-container{
+	background-color: #d23838;
+	max-width: 500px;
+	margin-top: 10%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.modal-container .modal-content{
+	width: 100%;
+	position: relative;
+}
+
+.preloader{
+	width: 70px;
+	height: 70px;
+	border: 10px solid rgb(236, 247, 255);
+	border-radius: 50%;
+	border-top-color: rgb(13, 141, 205); /* Color del cuarto de círculo */
+	animation: girar 2s infinite linear;
+}
+
+.preaction{
+	top: 0;
+	left: 50%;
+	right: 0;
+	position: absolute;
+	margin-top: 10px;
+	margin-left: -30px;
+	width: 60px;
+}
+
+.btn-stop{
+	width: 100%;
+	background-color: #760f0f;
+	color:#ffffff;
+	border-radius: 50px;
+	line-height: 50px;
+	cursor: pointer;
+	font-size: 9pt;
+}
+
+.btn-message{
+	padding: 12px;
+	margin: 5px;
+	cursor: pointer;
+}
+
+.btn-stop:focus{
+	background-color: #512323;
+}
+
+@keyframes girar {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+.md-close{
+	position: absolute;
+	top: 0;
+	right: 0;
+	display: block;
+	padding: 10px;
+	font-weight: bold;
+	cursor: pointer;
+	background: none;
+}
+
+@media screen and (max-width: 430px){
+
+	.container-background video{
+		display:none;
+	}
+
+	.container-background img{
+		display: inherit;
+		margin: 0;
+		width: 100%;
+		position: absolute;
+	}
+
+}
+
+@media (min-width: 320px) and (max-width: 463px){
+	
+	.container-background video{
+		display:none;
+	}
+	
+	.container-background img{
+		display: inherit;
+		margin: 0;
+		width: 100%;
+		position: absolute;
+	}
+
+}
+
+@media (max-width: 1024px) {
+	
+	.container-background video{
+		display:none;
+	}
+	
+	.container-background img{
+		display: inherit;
+		margin: 0;
+		width: 100%;
+		position: absolute;
+	}
+
+}
+  

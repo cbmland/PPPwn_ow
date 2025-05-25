@@ -1,0 +1,10 @@
+config params
+    option root '/root'
+    option path '/payloads'
+    option interface 'br-lan'
+    option version '1100'
+    option timeout '0'
+    option retry 'yes'
+    option sleep 'no'
+    option stage1 '/root/stage1/1100.bin'
+    option stage2 '/root/stage2/1100.bin'
