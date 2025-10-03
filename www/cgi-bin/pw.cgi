@@ -300,8 +300,24 @@ case "$task" in
     ;;
     "start")
 
+        echo "Content-Type: application/json"
+        echo ""
+        
         set_params
         /etc/init.d/pw start
+
+
+        echo "{"
+        echo "\"retry\":\"$retry\","
+        echo "\"sleep\":\"$sleep\","
+        echo "\"path\":\"$path\","
+        echo "\"autorun\":$auto,"
+        echo "\"adapter\":\"$adapter\","
+        echo "\"version\":\"$version\","
+        echo "\"timeout\":\"$timeout\""
+        echo "}"
+
+        exit 0
 
     ;;
     "stop")

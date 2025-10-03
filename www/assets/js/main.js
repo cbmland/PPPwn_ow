@@ -280,13 +280,15 @@ var appView = Backbone.View.extend({
                 }
             }).then(function(){
 
-                $.modal.close();
-                if(task == 'stop'){
-                    button.prop('task', 'start').removeClass('active').text('Start');
-                }else
-                if(task == 'start'){
-                    button.prop('task', 'start').addClass('active').text('Stop');
-                }
+                
+                // setTimeout(function(){$.modal.close();},500)
+                    
+                // if(task == 'stop'){
+                //     button.prop('task', 'start').removeClass('active').text('Start');
+                // }else
+                // if(task == 'start'){
+                //     button.prop('task', 'start').addClass('active').text('Stop');
+                // // }
 
             }).catch(function(err, textStatus, errorThrown){
                 if(err.responseText){
@@ -295,6 +297,20 @@ var appView = Backbone.View.extend({
                     $.modal.close();
                 }
             });
+            
+            //cgi 反应很慢，有间歇性网络中断，这里就不等了。模拟成功。
+            setTimeout(function(){
+
+                $.modal.close();
+
+                if(task == 'stop'){
+                    button.prop('task', 'start').removeClass('active').text('Start');
+                }else
+                if(task == 'start'){
+                    button.prop('task', 'start').addClass('active').text('Stop');
+                }
+
+            },1500)
 
         }
 
