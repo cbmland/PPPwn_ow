@@ -367,32 +367,32 @@ case "$task" in
         exit 0
 
     ;;
-    "update")
+    # "update")
 
-        echo "Content-Type: application/json"
-        echo ""
+    #     echo "Content-Type: application/json"
+    #     echo ""
         
-        #/etc/init.d/pw update
-        "$(/tmp/updater.sh)"
-        wait
+    #     #/etc/init.d/pw update
+    #     "$(/tmp/updater.sh)"
+    #     wait
 
-        echo "{\"output\":\"Updated!\"}"
+    #     echo "{\"output\":\"Updated!\"}"
 
-        exit 0
+    #     exit 0
         
-    ;;
-    "remove")
+    # ;;
+    # "remove")
 
-        echo "Content-Type: application/json"
-        echo ""
+    #     echo "Content-Type: application/json"
+    #     echo ""
 
-        rm_files
+    #     rm_files
         
-        echo "{\"output\":\"Uninstalled\"}"
+    #     echo "{\"output\":\"Uninstalled\"}"
 
-        exit 0
+    #     exit 0
         
-    ;;
+    # ;;
     "reconnect")
 
         echo "Content-Type: application/json"
@@ -401,16 +401,16 @@ case "$task" in
         echo "{"
         if pgrep pppoe-server > /dev/null; then
             /etc/init.d/pppoe-server stop
+            logger -t pppwn "pppoe-server service stopped"
             echo "\"output\":\"PPPoE service stopped\","
+            echo "\"pppoe\":false"
         elif ! pgrep pppoe-server > /dev/null; then
             /etc/init.d/pppoe-server start
+            logger -t pppwn "pppoe-server service started"
             echo "\"output\":\"PPPoE service started\","
-        fi
-        if pgrep pppoe-server > /dev/null; then
             echo "\"pppoe\":true"
-        else
-            echo "\"pppoe\":false"
         fi
+
         echo "}"
 
         exit 0
@@ -440,7 +440,8 @@ case "$task" in
         echo ""
         
         # 执行logread命令并转义输出
-        logread -e pppwn | tail -n 200 | sed 's/\\/\\\\/g; s/"/\\"/g' | tr -d ''
+        #logread -e pppwn | tail -n 200 | sed 's/\\/\\\\/g; s/"/\\"/g' | tr -d ''
+        logread -e pppwn | tail -n 200 | sed -E 's/[a-zA-Z]+ [a-zA-Z]+ [0-9]+ ([0-9]{2}:[0-9]{2}):[0-9]{2} [0-9]+ user\.notice pppwn: /\1 /' | sed 's/\\/\\\\/g; s/"/\\"/g'
 
         exit 0
 
