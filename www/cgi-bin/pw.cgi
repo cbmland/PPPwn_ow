@@ -439,7 +439,7 @@ case "$task" in
         echo "Content-Type: text/plain"
         echo ""
         
-        logread | grep -e "pppwn" -e "pppoe-server" | tail -n 200
+        logread | grep -e "pppwn" -e "pppoe-server" -e "pppd" | tail -n 400
         exit 0
 
     ;;

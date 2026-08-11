@@ -2,210 +2,193 @@
 <html>
     <head>
         <title>PPPWN OpenWRT PS4</title>
+        <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href="/assets/css/base.css" />
         <link rel="stylesheet" href="/assets/css/custom.css" />
-        <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
-        <script type="text/javascript" src="/assets/js/underscore-min.js"></script>
-        <script type="text/javascript" src="/assets/js/backbone-min.js"></script>
-        <script type="text/javascript" src="/assets/js/plugin.modal.js"></script>
+        <style>
+            [x-cloak] { display: none !important; }
+        </style>
+        <script defer src="/assets/js/alpine.min.js"></script>
+        <script defer src="/assets/js/main.js"></script>
     </head>
-    <body>
-        <div class="container">
-            <div class="content">
-                <div id="header">
-                    <div class="row">
-                        <ul class="menu">
-                            <li><a href="">PPPWN</a></li>
-                            <li><a href="#/payloads">Payloads</a></li>
-                            <li><a href="#/logs">Logs</a></li>
-                        </ul>
+    <body x-data="pppwnApp">
+        <!-- Top Navigation -->
+        <header class="container glass-panel" style="margin-top: 10px;">
+            <ul class="menu">
+                <li><a href="#/" :class="{ 'active': activeTab === 'pppwn' }" @click.prevent="changeTab('pppwn')">PPPWN</a></li>
+                <li><a href="#/payloads" :class="{ 'active': activeTab === 'payloads' }" @click.prevent="changeTab('payloads')">Payloads</a></li>
+                <li><a href="#/logs" :class="{ 'active': activeTab === 'logs' }" @click.prevent="changeTab('logs')">Logs</a></li>
+            </ul>
+        </header>
+
+        <!-- Main Body -->
+        <main class="container">
+            <!-- TAB 1: PPPWN Settings & Setup -->
+            <div x-show="activeTab === 'pppwn'" class="glass-panel" x-cloak>
+                <!-- CASE A: Not Installed State -->
+                <template x-if="!pppwn">
+                    <div class="form">
+                        <div class="form-group full-width" style="margin-bottom: 20px;">
+                            <p style="font-size: 16px; margin-bottom: 8px;">Chip architecture: <strong x-text="chipname" style="color: var(--accent-color);"></strong></p>
+                            <p style="color: var(--text-secondary); font-size: 14px;">Choose the pppwn compiled option compatible with your device</p>
+                        </div>
+                        <div class="form-grid" style="align-items: flex-end;">
+                            <div class="form-group">
+                                <label for="select-setup">Select pppwn version</label>
+                                <select id="select-setup" x-model="selectedSetupOption">
+                                    <template x-for="opt in compiled" :key="opt.type">
+                                        <option :value="opt.type" x-text="opt.label"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary" @click="setupBuild">Install</button>
+                        </div>
                     </div>
+                </template>
+
+                <!-- CASE B: Installed State (Config Form) -->
+                <template x-if="pppwn">
+                    <form class="form" @submit.prevent>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="inputRoot">Payload path</label>
+                                <input type="text" id="inputRoot" x-model="path" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputTimeout" title="Timeout execution">Timeout</label>
+                                <input type="number" id="inputTimeout" x-model.number="timeout" required>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label style="margin-bottom: 4px;">System Toggles</label>
+                                <div class="toggles-row">
+                                    <label class="toggle-container">
+                                        <input type="checkbox" x-model="autorun" style="display:none;">
+                                        <div class="toggle-switch"></div>
+                                        <span>Auto Run</span>
+                                    </label>
+                                    <label class="toggle-container">
+                                        <input type="checkbox" x-model="retry" true-value="yes" false-value="no" style="display:none;">
+                                        <div class="toggle-switch"></div>
+                                        <span>Auto Retry</span>
+                                    </label>
+                                    <label class="toggle-container">
+                                        <input type="checkbox" x-model="sleep" true-value="yes" false-value="no" style="display:none;">
+                                        <div class="toggle-switch"></div>
+                                        <span>Real Sleep</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="select-ifc">Ethernet Adapter</label>
+                                <select id="select-ifc" size="6" x-model="adapter" class="expand-slc" style="height: 120px;">
+                                    <template x-for="opt in interfaces" :key="opt.adapter">
+                                        <option :value="opt.adapter" x-text="opt.adapter" :selected="adapter === opt.adapter"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="select-fw">Firmware Version</label>
+                                <select id="select-fw" size="6" x-model="version" class="expand-slc" style="height: 120px;">
+                                    <template x-for="ver in versions" :key="ver">
+                                        <option :value="ver" x-text="ver" :selected="version === ver"></option>
+                                    </template>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="btn-row">
+                            <button type="button" class="btn btn-success" x-text="running ? 'Stop' : 'Start'" @click="toggleExploit(running ? 'stop' : 'start')"></button>
+                            <button type="button" class="btn btn-primary" @click="saveSettings">Save Settings</button>
+                            <button type="button" class="btn btn-secondary" x-text="pppoe ? 'PPPoE Stop' : 'PPPoE Start'" @click="togglePppoe"></button>
+                            <button type="button" class="btn btn-secondary" x-show="update" @click="confirmUpdate">Update</button>
+                            <button type="button" class="btn btn-danger" @click="confirmUninstall">Uninstall</button>
+                        </div>
+                    </form>
+                </template>
+            </div>
+
+            <!-- TAB 2: Payloads -->
+            <div x-show="activeTab === 'payloads'" class="glass-panel" x-cloak>
+                <div class="payloads-grid">
+                    <template x-if="payloadList.length === 0">
+                        <p style="color: var(--text-secondary); grid-column: 1 / -1;">Put your payloads in `/www/payloads` or mount your USB device to `/www/usb`</p>
+                    </template>
+                    <template x-for="item in payloadList" :key="item.path">
+                        <div style="display: contents;">
+                            <template x-if="item.sub">
+                                <div class="payload-group" x-text="item.label"></div>
+                            </template>
+                            <template x-if="item.sub">
+                                <div class="payloads-grid" style="grid-column: 1 / -1; margin-top: 10px; width: 100%;">
+                                    <template x-for="subitem in item.dir" :key="subitem.path">
+                                        <button type="button" class="btn btn-secondary" x-text="subitem.label" @click="sendPayload(subitem.path)"></button>
+                                    </template>
+                                </div>
+                            </template>
+                            <template x-if="!item.sub">
+                                <button type="button" class="btn btn-secondary" x-text="item.label" @click="sendPayload(item.path)"></button>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- TAB 3: Logs -->
+            <div x-show="activeTab === 'logs'" class="glass-panel" x-cloak>
+                <div class="log-controls">
+                    <button type="button" class="btn btn-secondary" @click="fetchLogs(true)" style="min-height: 38px; height: 38px; padding: 0 16px;">Refresh</button>
+                    
+                    <label class="log-filter-item">
+                        <input type="checkbox" x-model="logFilters.pppwn" @change="renderLogs"> pppwn
+                    </label>
+                    <label class="log-filter-item">
+                        <input type="checkbox" x-model="logFilters.pppoe" @change="renderLogs"> pppoe-server
+                    </label>
+                    <label class="log-filter-item">
+                        <input type="checkbox" x-model="logFilters.pppd" @change="renderLogs"> pppd
+                    </label>
+                    
+                    <div class="divider"></div>
+                    
+                    <label class="log-filter-item">
+                        <input type="checkbox" x-model="autoRefresh" @change="toggleAutoRefresh"> Auto Refresh (5s)
+                    </label>
+                </div>
+                <pre class="log-box" x-text="formattedLogs"></pre>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <sub><a target="_blank" href="https://ko-fi.com/invers3">Support me</a></sub>
+            <sub> | </sub>
+            <sub><a href="javascript:void(0)" @click="showAlert('TheOfficialFloW / SiSTR0 / xfangfang')">Credits</a></sub>
+            <sub> | </sub>
+            <sub><a target="_blank" href="https://x.com/Manyajmz">X</a></sub>
+            <sub> | </sub>
+            <sub><a target="_blank" href="https://github.com/CodeInvers3/">Github</a></sub>
+        </footer>
+
+        <!-- Loading spinner modal -->
+        <div class="modal-overlay" x-show="loading" x-cloak>
+            <div class="spinner"></div>
+        </div>
+
+        <!-- Custom Confirmation/Alert Modal -->
+        <div class="modal-overlay" x-show="modalMessage" x-cloak>
+            <div class="modal-card">
+                <button type="button" class="modal-close-btn" @click="closeModal">&times;</button>
+                <h3>System Message</h3>
+                <p x-text="modalMessage"></p>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <template x-for="btn in modalButtons" :key="btn.id">
+                        <button type="button" class="btn btn-secondary" style="min-height: 38px; padding: 0 16px;" x-text="btn.label" @click="$data[btn.action]()"></button>
+                    </template>
                 </div>
             </div>
         </div>
-        <div class="container">
-            <div id="appWeb" class="content">
-                <script type="text/template" id="webTpl">
-                    <form class="form">
-                        <% if(pppwn){ %>
-                            <fieldset>
-                                <div class="row">
-                                    <div class="field-group col-6">
-                                        <div class="row">
-                                            <div class="top-label"><label for="inputRoot">Payload path</label></div>
-                                            <input name="path" required type="text" id="inputRoot" class="sec-auto box" value="<%= path %>">
-                                        </div>
-                                        <div class="row">
-                                            <div class="top-label"><label for="inputTimeout" title="Timeout execution">Timeout</label></div>
-                                            <input name="timeout" required type="number" id="inputTimeout" class="sec-auto box" value="<%= timeout %>">
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-4">
-                                                <div class="top-label"><label for="inputAutorun" title="Enable auto executable">Auto Run</label></div>
-                                                <select name="auto-run" id="switch_pw" class="sec-auto box">
-                                                    <option <% if(autorun){ %>selected <% } %>value="1">On</option>
-                                                    <option <% if(!autorun){ %>selected <% } %>value="0">Off</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-4">
-                                                <div class="top-label"><label for="inputAutoretry" title="Enable auto executable">Auto Retry</label></div>
-                                                <select name="auto-retry" id="retry_pw" class="sec-auto box">
-                                                    <option <% if(retry){ %>selected <% } %>value="yes">On</option>
-                                                    <option <% if(!retry){ %>selected <% } %>value="no">Off</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-4">
-                                                <div class="top-label"><label for="inputRealsleep" title="Enable auto executable">Real Sleep</label></div>
-                                                <select name="real-sleep" id="sleep_pw" class="sec-auto box">
-                                                    <option <% if(sleep){ %>selected <% } %>value="yes">On</option>
-                                                    <option <% if(!sleep){ %>selected <% } %>value="no">Off</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="field-group col-6">
-                                        <div class="full">
-                                            <div class="top-label"><label for="select-ifc">Ethernet</label></div>
-                                            <select required id="select-ifc" size="8" class="expand-slc box" name="adapter">
-                                            <% interfaces.forEach(function(option, index){ %>
-                                                <% if(adapter == option.adapter){ %>
-                                                <option selected value="<%= option.adapter %>"><%= option.adapter %></option>
-                                                <% }else{ %>
-                                                <option value="<%= option.adapter %>"><%= option.adapter %></option>
-                                                <% } %>
-                                            <% }); %>
-                                            </select>
-                                        </div>
-                                        <div class="full">
-                                            <div class="top-label"><label for="select-fw">Firmware</label></div>
-                                            <select required id="select-fw" class="expand-slc box" size="8" name="version">
-                                            <% versions.forEach(function(_version, index){ %>
-                                                <% if(version == _version){ %>
-                                                <option selected value="<%= _version %>"><%= _version %></option>
-                                                <% }else{ %>
-                                                <option value="<%= _version %>"><%= _version %></option>
-                                                <% } %>
-                                            <% }); %>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="field-group box">
-                                    <div class="group-center">
-                                        <button type="button" id="action_pw" class="btn-form input-attach sec-auto"></button>
-                                        <button type="button" id="save_pw" class="btn-form input-attach sec-auto">Save Settings</button>
-                                        <% if(pppoe){ %>
-                                            <button type="button" id="pppoe_pw" class="btn-form input-attach sec-auto">PPPoe Stop</button>
-                                        <% }else{ %>
-                                            <button type="button" id="pppoe_pw" class="btn-form input-attach sec-auto">PPPoe Start</button>
-                                        <% } %>
-                                        <!-- <button type="button" id="remove_rep" class="btn-form input-attach sec-auto">Uninstall</button> -->
-                                        <% if(update){ %>
-                                        <button type="button" id="updater_rep" class="btn-form input-attach sec-auto">Update</button>
-                                        <% } %>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        <% }else{ %>
-                            <fieldset>
-                                <div class="field-group">
-                                    <div class="box">
-                                        <p>Chip architecture: <b><%= chipname %></b></p>
-                                        <p><sub>Choose the pppwn compiled option compatible with your device</sub></p>
-                                    </div>
-                                    <div class="box box-fill">
-                                        <div class="center">
-                                            <label>Select pppwn</label>
-                                            <select name="option">
-                                            <% compiled.forEach(function(option, index){ %>
-                                                <option value="<%= option.type %>"><%= option.label %></option>
-                                            <% }); %>
-                                            </select>
-                                            <button type="button" id="install_pw" class="btn btn-form">Install</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        <% } %>
-                    </form>
-                </script>
-                <script type="text/template" id="msgTpl">
-                    <div class="dialog-box">
-                        <button class="md-close" type="button" onclick="$.modal.close();">X</button>
-                        <p class="message"><%= message %></p>
-                        <% if(buttons){ %>
-                        <div>
-                            <% buttons.forEach(function(button, index){ %>
-                            <button class="btn-form btn-message" id="<%= button.id %>" onclick="<%= button.onclick %>"><%= button.label %></button>
-                            <% }); %>
-                        </div>
-                        <% } %>
-                    </div>
-                </script>
-                <script type="text/template" id="payloadTpl">
-                    <form class="form">
-                        <fieldset>
-                        <% if(file_list.length > 0){ %>
-                            <% file_list.forEach(function(payloads, index){ %>
-                                <% if(!payloads.sub){ %>
-                                    <button type="button" class="btn-basic sent-payload" value="<%= payloads.path %>"><%= payloads.label %></button>
-                                <% } %>
-                                <% }); %>
-                                </fieldset>
-                                <fieldset>
-                                <% file_list.forEach(function(payloads, index){ %>
-                                <% if(payloads.sub){ %>
-                                    <legend><%= payloads.label %></legend>
-                                    <% payloads.dir.forEach(function(payloads, index){ %>
-                                        <button type="button" class="btn-basic sent-payload" value="<%= payloads.path %>"><%= payloads.label %></button>
-                                    <% }); %>
-                                <% } %>
-                            <% }); %>
-                        <% }else{ %>
-                            <p>Put your payloads in /www/payloads or mount your usb device in /www/usb</p>
-                        <% } %>
-                        </fieldset>
-                    </form>
-                </script>
-                <script type="text/template" id="logTpl">
-                    <div class="log-container">
-                        <div class="log-header">
-                            <button type="button" id="refresh_log" class="btn-form" style="margin-bottom: 10px; padding: 8px 20px; font-size: 14px;">Refresh</button>
-                        </div>
-                        <div class="logText" style="
-                        font-size: small;
-                        overflow: auto;
-                        height: 80vh;
-                        color: #333;
-                        padding: 1em;
-                        background: #f5f5f5;
-                        border: 1px solid #ddd;
-                        border-radius: 4px;
-                        white-space: pre-wrap;
-                        word-wrap: break-word;
-                        user-select: text;
-                        -webkit-user-select: text;
-                        -moz-user-select: text;
-                        -ms-user-select: text;
-                    "><%= logText %></div>
-                    </div>
-                </script>
-            </div>
-        </div>
-        <div class="container">
-            <div id="footer" class="content">
-                <sub><a target="_blank" href="https://ko-fi.com/invers3">Support me</a></sub>
-                <sub> | </sub>
-                <sub><a id="credits" href="#credits">Credits</a></sub>
-                <sub> | </sub>
-                <sub><a target="_blank" href="https://x.com/Manyajmz">X</a></sub>
-                <sub> | </sub>
-                <sub><a target="_blank" href="https://github.com/CodeInvers3/">Github</a></sub>
-            </div>
-        </div>
-        <script src="/assets/js/main.js"></script>
     </body>
 </html>
