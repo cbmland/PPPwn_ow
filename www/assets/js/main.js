@@ -550,7 +550,63 @@ var appView = Backbone.View.extend({
             dataType: 'text',  // 指定响应数据类型为文本
         }).then(function(response){
             $.modal.close();
-            var cleanText = response;
+            
+            // 规范化所有换行符（将 \r\n 和单独的 \r 统一替换为 \n）
+            var normalized = response.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            var lines = normalized.split('\n');
+            var formattedLines = [];
+            
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i];
+                if (!line.trim() && i === lines.length - 1) {
+                    continue; // 忽略末尾的空行
+                }
+                
+                var match;
+                if (line.match(/^\s*\[/)) {
+                    // 格式A: [Aug 11, 2026, 5:04:15 PM GMT+8] user.notice: pppwn: ...
+                    match = line.match(/^\s*\[([^\]]+)\]\s+(\S+?)(?:\s*:\s*|\s+)(.*)$/);
+                } else {
+                    // 格式B: Tue Aug 11 17:05:47 2026 user.notice pppwn: ...
+                    match = line.match(/^\s*([A-Za-z]{3}\s+[A-Za-z]{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}\s+\d{4})\s+(\S+?)(?:\s*:\s*|\s+)(.*)$/);
+                }
+                
+                if (match) {
+                    var rawTime = match[1];
+                    var content = match[3];
+                    
+                    // 提取并精简时间格式为 HH:mm:ss
+                    var timeMatch = rawTime.match(/(\d{1,2}):(\d{2}):(\d{2})\s*([AP]M)?/i);
+                    var formattedTime = "";
+                    if (timeMatch) {
+                        var hrs = parseInt(timeMatch[1], 10);
+                        var mins = timeMatch[2];
+                        var secs = timeMatch[3];
+                        var ampm = timeMatch[4];
+                        if (ampm) {
+                            ampm = ampm.toUpperCase();
+                            if (ampm === 'PM' && hrs < 12) hrs += 12;
+                            if (ampm === 'AM' && hrs === 12) hrs = 0;
+                        }
+                        var hrsStr = hrs.toString();
+                        if (hrsStr.length < 2) hrsStr = "0" + hrsStr;
+                        formattedTime = hrsStr + ":" + mins + ":" + secs;
+                    } else {
+                        formattedTime = rawTime;
+                    }
+                    
+                    formattedLines.push("[" + formattedTime + "] " + content);
+                } else {
+                    // 没有时间戳的行（如堆整理进度 [*] Heap grooming...），对齐缩进（约11个空格）
+                    if (line.trim() !== "") {
+                        formattedLines.push("           " + line);
+                    } else {
+                        formattedLines.push("");
+                    }
+                }
+            }
+            
+            var cleanText = formattedLines.join('\n');
             self.$el.html(self.templates.log({"logText":cleanText}));
             
             // 添加自动滚动到底部的功能

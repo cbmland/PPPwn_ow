@@ -436,14 +436,10 @@ case "$task" in
     ;;
     "logs")
 
-        echo "Content-Type: pain/text"
+        echo "Content-Type: text/plain"
         echo ""
         
-        # 执行logread命令并转义输出
-        logread -e pppwn | tail -n 200 | sed 's/\\/\\\\/g; s/"/\\"/g' | tr -d ''
-        #logread -e pppwn | tail -n 200 | sed -E 's/[a-zA-Z]+ [a-zA-Z]+ [0-9]+ ([0-9]{2}:[0-9]{2}):[0-9]{2} [0-9]+ user\.notice pppwn: /\1 /' | sed 's/\\/\\\\/g; s/"/\\"/g'
-        #logread -e pppwn | tail -n 200 | sed -E 's/\[[A-Za-z]+ [0-9]+, [0-9]+, ([0-9]{1,2}:[0-9]{2}:[0-9]{2} [AP]M) [^\]+\] user\.notice: /\1 /g' | sed 's/\\/\\\\/g; s/"/\\"/g'
-        #logread -e pppwn | tail -n 200 | sed -E 's/^\[[A-Za-z]+ [0-9]+, [0-9]+, ([0-9]{1,2}:[0-9]{2}:[0-9]{2} [AP]M) [^\]]+\] [a-z0-9\.]+: /\1 /' | sed 's/\\/\\\\/g; s/"/\\"/g'
+        logread | grep -e "pppwn" -e "pppoe-server" | tail -n 200
         exit 0
 
     ;;
