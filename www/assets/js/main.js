@@ -45,6 +45,8 @@ function registerAlpineApp() {
             loading: false,
             modalMessage: '',
             modalButtons: [],
+            showSettings: window.innerWidth > 640,
+            logsLoading: false,
             
             // Payload list
             payloadList: [],
@@ -91,9 +93,9 @@ function registerAlpineApp() {
                 if (tab === 'payloads') {
                     this.fetchPayloads();
                 } else if (tab === 'logs') {
-                    this.fetchLogs(true);
+                    this.fetchLogs(false);
                 } else {
-                    this.fetchState();
+                    this.fetchState(true);
                 }
             },
 
@@ -264,21 +266,23 @@ function registerAlpineApp() {
                     });
             },
 
-            togglePppoe: function() {
+             togglePppoe: function() {
                 var self = this;
-                this.loading = true;
+                // Optimistically toggle state locally for instant visual feedback
+                this.pppoe = !this.pppoe;
                 
                 this.requestCgi({ task: 'reconnect' })
                     .then(function(res) {
-                        self.loading = false;
                         if (typeof res === 'string') {
                             try { res = JSON.parse(res); } catch(e) {}
                         }
-                        self.pppoe = !!res.pppoe;
-                        self.showAlert(res.output || 'PPPoE action completed.');
+                        if (typeof res === 'object' && res.pppoe !== undefined) {
+                            self.pppoe = !!res.pppoe;
+                        }
                     })
                     .catch(function(err) {
-                        self.loading = false;
+                        // Revert the optimistic change on error
+                        self.pppoe = !self.pppoe;
                         self.showError(err);
                     });
             },
@@ -367,7 +371,7 @@ function registerAlpineApp() {
                 };
                 statusXhr.onerror = function() {
                     self.loading = false;
-                    self.showAlert('Cannot load payload: Binloader server is not running on the console.');
+                        self.showAlert('Cannot load payload: Binloader server is not running on the console.');
                 };
                 statusXhr.send();
             },
@@ -375,15 +379,18 @@ function registerAlpineApp() {
             fetchLogs: function(showLoader) {
                 var self = this;
                 if (showLoader) this.loading = true;
+                this.logsLoading = true;
                 
                 this.requestCgi({ task: 'logs' })
                     .then(function(res) {
                         self.loading = false;
+                        self.logsLoading = false;
                         self.rawLogs = res;
                         self.renderLogs();
                     })
                     .catch(function(err) {
                         self.loading = false;
+                        self.logsLoading = false;
                         self.showError(err);
                     });
             },

@@ -5,7 +5,7 @@ STOP=15
 
 start() {
 
-    if ! pgrep pppwn > /dev/null; then
+    if ! pgrep -f "pppwn --interface" > /dev/null; then
 
         interface=$(uci get pw.@params[0].interface)
         retry=$(uci get pw.@params[0].retry)
@@ -77,7 +77,7 @@ stop() {
     sleep 5
     ip link set $interface up
 
-    pids=$(pgrep pppwn)
+    pids=$(pgrep -f "pppwn --interface")
     
     for pid in $pids; do
         kill $pid

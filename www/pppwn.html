@@ -50,7 +50,16 @@
                 <!-- CASE B: Installed State (Config Form) -->
                 <template x-if="pppwn">
                     <form class="form" @submit.prevent>
-                        <div class="form-grid">
+                        <!-- Collapsible Configuration Settings Header for Mobile -->
+                        <div class="mobile-settings-toggle" @click="showSettings = !showSettings">
+                            <span style="font-weight: bold; font-size: 14px; color: var(--accent-color); display: inline-flex; align-items: center; gap: 6px;">
+                                <span x-text="showSettings ? '▼' : '▶'"></span> Settings
+                            </span>
+                            <span x-show="!showSettings" style="font-size: 13px; color: var(--text-secondary);" x-text="`${adapter} | FW: ${version} | ${timeout}s`"></span>
+                        </div>
+
+                        <!-- Config Grid -->
+                        <div class="form-grid" :class="{ 'mobile-collapsed': !showSettings }">
                             <div class="form-group">
                                 <label for="inputRoot">Payload path</label>
                                 <input type="text" id="inputRoot" x-model="path" required>
@@ -138,25 +147,33 @@
             <!-- TAB 3: Logs -->
             <div x-show="activeTab === 'logs'" class="glass-panel" x-cloak>
                 <div class="log-controls">
-                    <button type="button" class="btn btn-secondary" @click="fetchLogs(true)" style="min-height: 38px; height: 38px; padding: 0 16px;">Refresh</button>
-                    
-                    <label class="log-filter-item">
-                        <input type="checkbox" x-model="logFilters.pppwn" @change="renderLogs"> pppwn
-                    </label>
-                    <label class="log-filter-item">
-                        <input type="checkbox" x-model="logFilters.pppoe" @change="renderLogs"> pppoe-server
-                    </label>
-                    <label class="log-filter-item">
-                        <input type="checkbox" x-model="logFilters.pppd" @change="renderLogs"> pppd
-                    </label>
+                    <!-- Group 1: Actions (Refresh & Auto Refresh) -->
+                    <div class="log-controls-group">
+                        <button type="button" class="btn btn-secondary" @click="fetchLogs(false)" :disabled="logsLoading" style="min-height: 38px; height: 38px; padding: 0 16px; margin: 0; flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                            <span x-show="logsLoading" style="width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; display: inline-block; animation: spin 1s infinite linear;" x-cloak></span>
+                            <span x-text="logsLoading ? 'Refreshing...' : 'Refresh'"></span>
+                        </button>
+                        <label class="log-filter-item" style="white-space: nowrap; flex-shrink: 0; width: 150px; justify-content: flex-end;">
+                            <input type="checkbox" x-model="autoRefresh" @change="toggleAutoRefresh"> Auto Refresh (5s)
+                        </label>
+                    </div>
                     
                     <div class="divider"></div>
                     
-                    <label class="log-filter-item">
-                        <input type="checkbox" x-model="autoRefresh" @change="toggleAutoRefresh"> Auto Refresh (5s)
-                    </label>
+                    <!-- Group 2: Filters -->
+                    <div class="log-controls-group">
+                        <label class="log-filter-item">
+                            <input type="checkbox" x-model="logFilters.pppwn" @change="renderLogs"> pppwn
+                        </label>
+                        <label class="log-filter-item">
+                            <input type="checkbox" x-model="logFilters.pppoe" @change="renderLogs"> pppoe-server
+                        </label>
+                        <label class="log-filter-item">
+                            <input type="checkbox" x-model="logFilters.pppd" @change="renderLogs"> pppd
+                        </label>
+                    </div>
                 </div>
-                <pre class="log-box" x-text="formattedLogs"></pre>
+                <pre class="log-box" :style="{ opacity: logsLoading ? 0.6 : 1 }" style="transition: opacity 0.2s ease;" x-text="formattedLogs"></pre>
             </div>
         </main>
 

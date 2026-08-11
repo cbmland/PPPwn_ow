@@ -212,7 +212,7 @@ case "$task" in
                 echo $eths | sed "s/,$//"
             fi
             echo "],";
-            if pgrep pppwn > /dev/null; then
+            if pgrep -f "pppwn --interface" > /dev/null; then
                 echo "\"running\":true,"
             else
                 echo "\"running\":false,"
@@ -400,12 +400,12 @@ case "$task" in
 
         echo "{"
         if pgrep pppoe-server > /dev/null; then
-            /etc/init.d/pppoe-server stop
+            /etc/init.d/pppoe-server stop >/dev/null 2>&1 &
             logger -t pppwn "pppoe-server service stopped"
             echo "\"output\":\"PPPoE service stopped\","
             echo "\"pppoe\":false"
         elif ! pgrep pppoe-server > /dev/null; then
-            /etc/init.d/pppoe-server start
+            /etc/init.d/pppoe-server start >/dev/null 2>&1 &
             logger -t pppwn "pppoe-server service started"
             echo "\"output\":\"PPPoE service started\","
             echo "\"pppoe\":true"
