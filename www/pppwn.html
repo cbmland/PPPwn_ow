@@ -9,8 +9,8 @@
         <style>
             [x-cloak] { display: none !important; }
         </style>
-        <script defer src="/assets/js/alpine.min.js"></script>
-        <script defer src="/assets/js/main.js"></script>
+        <script src="/assets/js/main.js"></script>
+        <script src="/assets/js/alpine.min.js"></script>
     </head>
     <body x-data="pppwnApp">
         <!-- Top Navigation -->
@@ -25,7 +25,7 @@
         <!-- Main Body -->
         <main class="container">
             <!-- TAB 1: PPPWN Settings & Setup -->
-            <div x-show="activeTab === 'pppwn'" class="glass-panel" x-cloak>
+            <div x-show="activeTab === 'pppwn'" class="glass-panel" style="overflow-y: auto;" x-cloak>
                 <!-- CASE A: Not Installed State -->
                 <template x-if="!pppwn">
                     <div class="form">
@@ -69,12 +69,12 @@
                                         <span>Auto Run</span>
                                     </label>
                                     <label class="toggle-container">
-                                        <input type="checkbox" x-model="retry" true-value="yes" false-value="no" style="display:none;">
+                                        <input type="checkbox" x-model="retry" style="display:none;">
                                         <div class="toggle-switch"></div>
                                         <span>Auto Retry</span>
                                     </label>
                                     <label class="toggle-container">
-                                        <input type="checkbox" x-model="sleep" true-value="yes" false-value="no" style="display:none;">
+                                        <input type="checkbox" x-model="sleep" style="display:none;">
                                         <div class="toggle-switch"></div>
                                         <span>Real Sleep</span>
                                     </label>
@@ -83,17 +83,17 @@
                             
                             <div class="form-group">
                                 <label for="select-ifc">Ethernet Adapter</label>
-                                <select id="select-ifc" size="6" x-model="adapter" class="expand-slc" style="height: 120px;">
+                                <select id="select-ifc" x-model="adapter" class="expand-slc">
                                     <template x-for="opt in interfaces" :key="opt.adapter">
-                                        <option :value="opt.adapter" x-text="opt.adapter" :selected="adapter === opt.adapter"></option>
+                                        <option :value="opt.adapter" x-text="opt.adapter" :selected="opt.adapter === adapter"></option>
                                     </template>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="select-fw">Firmware Version</label>
-                                <select id="select-fw" size="6" x-model="version" class="expand-slc" style="height: 120px;">
+                                <select id="select-fw" x-model="version" class="expand-slc">
                                     <template x-for="ver in versions" :key="ver">
-                                        <option :value="ver" x-text="ver" :selected="version === ver"></option>
+                                        <option :value="ver" x-text="ver" :selected="ver === version"></option>
                                     </template>
                                 </select>
                             </div>
@@ -104,14 +104,13 @@
                             <button type="button" class="btn btn-primary" @click="saveSettings">Save Settings</button>
                             <button type="button" class="btn btn-secondary" x-text="pppoe ? 'PPPoE Stop' : 'PPPoE Start'" @click="togglePppoe"></button>
                             <button type="button" class="btn btn-secondary" x-show="update" @click="confirmUpdate">Update</button>
-                            <button type="button" class="btn btn-danger" @click="confirmUninstall">Uninstall</button>
                         </div>
                     </form>
                 </template>
             </div>
 
             <!-- TAB 2: Payloads -->
-            <div x-show="activeTab === 'payloads'" class="glass-panel" x-cloak>
+            <div x-show="activeTab === 'payloads'" class="glass-panel" style="overflow-y: auto;" x-cloak>
                 <div class="payloads-grid">
                     <template x-if="payloadList.length === 0">
                         <p style="color: var(--text-secondary); grid-column: 1 / -1;">Put your payloads in `/www/payloads` or mount your USB device to `/www/usb`</p>
@@ -185,7 +184,7 @@
                 <p x-text="modalMessage"></p>
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
                     <template x-for="btn in modalButtons" :key="btn.id">
-                        <button type="button" class="btn btn-secondary" style="min-height: 38px; padding: 0 16px;" x-text="btn.label" @click="$data[btn.action]()"></button>
+                        <button type="button" class="btn btn-secondary" style="min-height: 38px; padding: 0 16px;" x-text="btn.label" @click="handleModalAction(btn.action)"></button>
                     </template>
                 </div>
             </div>

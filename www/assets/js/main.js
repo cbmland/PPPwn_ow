@@ -1,4 +1,10 @@
-document.addEventListener('alpine:init', function() {
+if (window.Alpine) {
+    registerAlpineApp();
+} else {
+    document.addEventListener('alpine:init', registerAlpineApp);
+}
+
+function registerAlpineApp() {
     Alpine.data('pppwnApp', function() {
         return {
             // Tab states
@@ -21,8 +27,8 @@ document.addEventListener('alpine:init', function() {
             stage1: {},
             stage2: {},
             adapter: '',
-            retry: 'no',
-            sleep: 'no',
+            retry: false,
+            sleep: false,
             
             // Log states
             rawLogs: '',
@@ -77,6 +83,9 @@ document.addEventListener('alpine:init', function() {
                 // Manage auto-refresh timer when switching tabs
                 if (tab !== 'logs') {
                     this.stopAutoRefresh();
+                } else {
+                    this.autoRefresh = true;
+                    this.toggleAutoRefresh();
                 }
                 
                 if (tab === 'payloads') {
@@ -158,17 +167,29 @@ document.addEventListener('alpine:init', function() {
                         self.running = !!res.running;
                         self.autorun = !!res.autorun;
                         self.path = res.path || '/payloads';
-                        self.interfaces = res.interfaces || [];
+                        var rawInterfaces = res.interfaces || [];
+                        self.interfaces = rawInterfaces.filter(function(item) {
+                            return item && item.adapter && item.adapter.indexOf('+') === -1 && item.adapter.indexOf('PPPwn') === -1 && item.adapter.indexOf('PlayStation') === -1;
+                        });
                         self.timeout = res.timeout || 0;
                         self.version = res.version || '';
-                        self.versions = res.versions || [];
+                        var rawVersions = res.versions || [];
+                        self.versions = rawVersions.sort(function(a, b) {
+                            return parseInt(a, 10) - parseInt(b, 10);
+                        });
                         self.stage1 = res.stage1 || {};
                         self.stage2 = res.stage2 || {};
                         
                         // Select default options
+                        self.retry = res.retry === 'yes';
+                        self.sleep = res.sleep === 'yes';
+                        
                         if (res.adapter) self.adapter = res.adapter;
-                        if (res.retry) self.retry = res.retry;
-                        if (res.sleep) self.sleep = res.sleep;
+                        
+                        Alpine.nextTick(function() {
+                            if (res.adapter) self.adapter = res.adapter;
+                            if (res.version) self.version = res.version;
+                        });
                         
                         if (self.compiled.length > 0 && !self.selectedSetupOption) {
                             self.selectedSetupOption = self.compiled[0].type;
@@ -193,8 +214,8 @@ document.addEventListener('alpine:init', function() {
                     adapter: this.adapter,
                     version: this.version,
                     auto: this.autorun ? '1' : '0',
-                    retry: this.retry,
-                    sleep: this.sleep
+                    retry: this.retry ? 'yes' : 'no',
+                    sleep: this.sleep ? 'yes' : 'no'
                 };
                 
                 this.requestCgi(data)
@@ -222,17 +243,20 @@ document.addEventListener('alpine:init', function() {
                     stage2: this.stage2[this.version] || '',
                     timeout: this.timeout,
                     auto: this.autorun ? '1' : '0',
-                    retry: this.retry,
-                    sleep: this.sleep
+                    retry: this.retry ? 'yes' : 'no',
+                    sleep: this.sleep ? 'yes' : 'no'
                 };
                 
                 this.requestCgi(data)
                     .then(function(res) {
-                        // Exploit takes time, simulate success change quietly after short timeout
+                        self.running = (action === 'start');
                         setTimeout(function() {
                             self.loading = false;
+                        }, 1000);
+                        
+                        setTimeout(function() {
                             self.fetchState(true);
-                        }, 1500);
+                        }, 6500);
                     })
                     .catch(function(err) {
                         self.loading = false;
@@ -449,7 +473,7 @@ document.addEventListener('alpine:init', function() {
                 this.formattedLogs = formatted.join('\n');
                 
                 // Scroll log view to bottom
-                this.$nextTick(function() {
+                Alpine.nextTick(function() {
                     var el = document.querySelector('.log-box');
                     if (el) {
                         el.scrollTop = el.scrollHeight;
@@ -498,27 +522,10 @@ document.addEventListener('alpine:init', function() {
                 this.modalButtons = [];
             },
 
-            confirmUninstall: function() {
-                this.modalMessage = 'Uninstall PPPwn OpenWrt?';
-                this.modalButtons = [
-                    { label: 'Yes, uninstall', id: 'uninstall_btn', action: 'executeUninstall' },
-                    { label: 'Cancel', id: 'cancel_btn', action: 'closeModal' }
-                ];
-            },
-
-            executeUninstall: function() {
-                var self = this;
-                this.closeModal();
-                this.loading = true;
-                
-                this.requestCgi({ task: 'remove' })
-                    .then(function() {
-                        window.location.assign("/");
-                    })
-                    .catch(function(err) {
-                        self.loading = false;
-                        self.showError(err);
-                    });
+            handleModalAction: function(actionName) {
+                if (typeof this[actionName] === 'function') {
+                    this[actionName]();
+                }
             },
 
             confirmUpdate: function() {
@@ -547,4 +554,4 @@ document.addEventListener('alpine:init', function() {
             }
         };
     });
-});
+}

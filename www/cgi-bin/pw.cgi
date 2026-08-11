@@ -304,7 +304,7 @@ case "$task" in
         echo ""
         
         set_params
-        /etc/init.d/pw start
+        /etc/init.d/pw start >/dev/null 2>&1 &
 
 
         echo "{"
@@ -325,7 +325,7 @@ case "$task" in
         echo "Content-Type: application/json"
         echo ""
         
-        /etc/init.d/pw stop
+        /etc/init.d/pw stop >/dev/null 2>&1 &
 
         echo "{"
         echo "\"retry\":\"$retry\","

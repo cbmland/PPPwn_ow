@@ -28,16 +28,23 @@ body {
   background: var(--bg-gradient);
   background-attachment: fixed;
   background-size: cover;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   padding: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
 }
 
 .container {
   max-width: 800px;
   margin: 0 auto 20px auto;
   width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 /* Glassmorphic Panel Base */
@@ -49,12 +56,17 @@ body {
   border-radius: 16px;
   box-shadow: var(--card-shadow);
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 /* Header & Menu */
 header.glass-panel {
   padding: 16px 24px;
   margin-bottom: 20px;
+  flex: none;
 }
 
 header .menu {
@@ -327,7 +339,8 @@ input[type="checkbox"]:checked + .toggle-switch::after {
   border: 1px solid var(--panel-border);
   border-radius: 8px;
   padding: 16px;
-  height: 65vh;
+  flex: 1;
+  min-height: 200px;
   overflow-y: auto;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
   font-size: 13px;
