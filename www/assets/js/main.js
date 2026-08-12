@@ -29,6 +29,8 @@ function registerAlpineApp() {
             adapter: '',
             retry: false,
             sleep: false,
+            stateLoading: false,
+            payloadsLoading: false,
             
             // Log states
             rawLogs: '',
@@ -37,8 +39,8 @@ function registerAlpineApp() {
             autoRefreshInterval: null,
             logFilters: {
                 pppwn: true,
-                pppoe: true,
-                pppd: false
+                pppoe: false,
+                pppd: true
             },
             
             // UI helper states
@@ -64,7 +66,7 @@ function registerAlpineApp() {
                 });
                 
                 // Fetch initial state
-                this.fetchState();
+                this.fetchState(true);
             },
 
             routeByHash: function() {
@@ -148,10 +150,12 @@ function registerAlpineApp() {
             fetchState: function(quiet) {
                 var self = this;
                 if (!quiet) this.loading = true;
+                this.stateLoading = true;
                 
                 return this.requestCgi({ task: 'state' })
                     .then(function(res) {
                         self.loading = false;
+                        self.stateLoading = false;
                         if (typeof res === 'string') {
                             try { res = JSON.parse(res); } catch(e) {}
                         }
@@ -199,6 +203,7 @@ function registerAlpineApp() {
                     })
                     .catch(function(err) {
                         self.loading = false;
+                        self.stateLoading = false;
                         self.showError(err);
                     });
             },
@@ -305,14 +310,17 @@ function registerAlpineApp() {
 
             fetchPayloads: function() {
                 var self = this;
+                this.payloadsLoading = true;
                 this.requestCgi({ task: 'payloads' })
                     .then(function(res) {
+                        self.payloadsLoading = false;
                         if (typeof res === 'string') {
                             try { res = JSON.parse(res); } catch(e) {}
                         }
                         self.payloadList = res.file_list || [];
                     })
                     .catch(function(err) {
+                        self.payloadsLoading = false;
                         self.showError(err);
                     });
             },

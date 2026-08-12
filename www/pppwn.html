@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>PPPWN OpenWRT PS4</title>
+        <title>PPPWN OpenWRT PS4 -- </title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href="/assets/css/base.css" />
@@ -26,102 +26,104 @@
         <main class="container">
             <!-- TAB 1: PPPWN Settings & Setup -->
             <div x-show="activeTab === 'pppwn'" class="glass-panel" style="overflow-y: auto;" x-cloak>
-                <!-- CASE A: Not Installed State -->
-                <template x-if="!pppwn">
-                    <div class="form">
-                        <div class="form-group full-width" style="margin-bottom: 20px;">
-                            <p style="font-size: 16px; margin-bottom: 8px;">Chip architecture: <strong x-text="chipname" style="color: var(--accent-color);"></strong></p>
-                            <p style="color: var(--text-secondary); font-size: 14px;">Choose the pppwn compiled option compatible with your device</p>
-                        </div>
-                        <div class="form-grid" style="align-items: flex-end;">
-                            <div class="form-group">
-                                <label for="select-setup">Select pppwn version</label>
-                                <select id="select-setup" x-model="selectedSetupOption">
-                                    <template x-for="opt in compiled" :key="opt.type">
-                                        <option :value="opt.type" x-text="opt.label"></option>
-                                    </template>
-                                </select>
+                <div :style="{ opacity: stateLoading ? 0.6 : 1, transition: 'opacity 0.2s ease' }">
+                    <!-- CASE A: Not Installed State -->
+                    <template x-if="!pppwn">
+                        <div class="form">
+                            <div class="form-group full-width" style="margin-bottom: 20px;">
+                                <p style="font-size: 16px; margin-bottom: 8px;">Chip architecture: <strong x-text="chipname" style="color: var(--accent-color);"></strong></p>
+                                <p style="color: var(--text-secondary); font-size: 14px;">Choose the pppwn compiled option compatible with your device</p>
                             </div>
-                            <button type="button" class="btn btn-primary" @click="setupBuild">Install</button>
+                            <div class="form-grid" style="align-items: flex-end;">
+                                <div class="form-group">
+                                    <label for="select-setup">Select pppwn version</label>
+                                    <select id="select-setup" x-model="selectedSetupOption">
+                                        <template x-for="opt in compiled" :key="opt.type">
+                                            <option :value="opt.type" x-text="opt.label"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <button type="button" class="btn btn-primary" @click="setupBuild">Install</button>
+                            </div>
                         </div>
-                    </div>
-                </template>
+                    </template>
 
-                <!-- CASE B: Installed State (Config Form) -->
-                <template x-if="pppwn">
-                    <form class="form" @submit.prevent>
-                        <!-- Collapsible Configuration Settings Header for Mobile -->
-                        <div class="mobile-settings-toggle" @click="showSettings = !showSettings">
-                            <span style="font-weight: bold; font-size: 14px; color: var(--accent-color); display: inline-flex; align-items: center; gap: 6px;">
-                                <span x-text="showSettings ? '▼' : '▶'"></span> Settings
-                            </span>
-                            <span x-show="!showSettings" style="font-size: 13px; color: var(--text-secondary);" x-text="`${adapter} | FW: ${version} | ${timeout}s`"></span>
-                        </div>
+                    <!-- CASE B: Installed State (Config Form) -->
+                    <template x-if="pppwn">
+                        <form class="form" @submit.prevent>
+                            <!-- Collapsible Configuration Settings Header for Mobile -->
+                            <div class="mobile-settings-toggle" @click="showSettings = !showSettings">
+                                <span style="font-weight: bold; font-size: 14px; color: var(--accent-color); display: inline-flex; align-items: center; gap: 6px;">
+                                    <span x-text="showSettings ? '▼' : '▶'"></span> Settings
+                                </span>
+                                <span x-show="!showSettings" style="font-size: 13px; color: var(--text-secondary);" x-text="`${adapter} | FW: ${version} | ${timeout}s`"></span>
+                            </div>
 
-                        <!-- Config Grid -->
-                        <div class="form-grid" :class="{ 'mobile-collapsed': !showSettings }">
-                            <div class="form-group">
-                                <label for="inputRoot">Payload path</label>
-                                <input type="text" id="inputRoot" x-model="path" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="inputTimeout" title="Timeout execution">Timeout</label>
-                                <input type="number" id="inputTimeout" x-model.number="timeout" required>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label style="margin-bottom: 4px;">System Toggles</label>
-                                <div class="toggles-row">
-                                    <label class="toggle-container">
-                                        <input type="checkbox" x-model="autorun" style="display:none;">
-                                        <div class="toggle-switch"></div>
-                                        <span>Auto Run</span>
-                                    </label>
-                                    <label class="toggle-container">
-                                        <input type="checkbox" x-model="retry" style="display:none;">
-                                        <div class="toggle-switch"></div>
-                                        <span>Auto Retry</span>
-                                    </label>
-                                    <label class="toggle-container">
-                                        <input type="checkbox" x-model="sleep" style="display:none;">
-                                        <div class="toggle-switch"></div>
-                                        <span>Real Sleep</span>
-                                    </label>
+                            <!-- Config Grid -->
+                            <div class="form-grid" :class="{ 'mobile-collapsed': !showSettings }">
+                                <div class="form-group">
+                                    <label for="inputRoot">Payload path</label>
+                                    <input type="text" id="inputRoot" x-model="path" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputTimeout" title="Timeout execution">Timeout</label>
+                                    <input type="number" id="inputTimeout" x-model.number="timeout" required>
+                                </div>
+                                
+                                <div class="form-group full-width">
+                                    <label style="margin-bottom: 4px;">System Toggles</label>
+                                    <div class="toggles-row">
+                                        <label class="toggle-container">
+                                            <input type="checkbox" x-model="autorun" style="display:none;">
+                                            <div class="toggle-switch"></div>
+                                            <span>Auto Run</span>
+                                        </label>
+                                        <label class="toggle-container">
+                                            <input type="checkbox" x-model="retry" style="display:none;">
+                                            <div class="toggle-switch"></div>
+                                            <span>Auto Retry</span>
+                                        </label>
+                                        <label class="toggle-container">
+                                            <input type="checkbox" x-model="sleep" style="display:none;">
+                                            <div class="toggle-switch"></div>
+                                            <span>Real Sleep</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="select-ifc">Ethernet Adapter</label>
+                                    <select id="select-ifc" x-model="adapter" class="expand-slc">
+                                        <template x-for="opt in interfaces" :key="opt.adapter">
+                                            <option :value="opt.adapter" x-text="opt.adapter" :selected="opt.adapter === adapter"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="select-fw">Firmware Version</label>
+                                    <select id="select-fw" x-model="version" class="expand-slc">
+                                        <template x-for="ver in versions" :key="ver">
+                                            <option :value="ver" x-text="ver" :selected="ver === version"></option>
+                                        </template>
+                                    </select>
                                 </div>
                             </div>
                             
-                            <div class="form-group">
-                                <label for="select-ifc">Ethernet Adapter</label>
-                                <select id="select-ifc" x-model="adapter" class="expand-slc">
-                                    <template x-for="opt in interfaces" :key="opt.adapter">
-                                        <option :value="opt.adapter" x-text="opt.adapter" :selected="opt.adapter === adapter"></option>
-                                    </template>
-                                </select>
+                            <div class="btn-row">
+                                <button type="button" class="btn btn-success" x-text="running ? 'Stop' : 'Start'" @click="toggleExploit(running ? 'stop' : 'start')"></button>
+                                <button type="button" class="btn btn-primary" @click="saveSettings">Save Settings</button>
+                                <button type="button" class="btn btn-secondary" x-text="pppoe ? 'PPPoE Stop' : 'PPPoE Start'" @click="togglePppoe"></button>
+                                <button type="button" class="btn btn-secondary" x-show="update" @click="confirmUpdate">Update</button>
                             </div>
-                            <div class="form-group">
-                                <label for="select-fw">Firmware Version</label>
-                                <select id="select-fw" x-model="version" class="expand-slc">
-                                    <template x-for="ver in versions" :key="ver">
-                                        <option :value="ver" x-text="ver" :selected="ver === version"></option>
-                                    </template>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="btn-row">
-                            <button type="button" class="btn btn-success" x-text="running ? 'Stop' : 'Start'" @click="toggleExploit(running ? 'stop' : 'start')"></button>
-                            <button type="button" class="btn btn-primary" @click="saveSettings">Save Settings</button>
-                            <button type="button" class="btn btn-secondary" x-text="pppoe ? 'PPPoE Stop' : 'PPPoE Start'" @click="togglePppoe"></button>
-                            <button type="button" class="btn btn-secondary" x-show="update" @click="confirmUpdate">Update</button>
-                        </div>
-                    </form>
-                </template>
+                        </form>
+                    </template>
+                </div>
             </div>
 
             <!-- TAB 2: Payloads -->
             <div x-show="activeTab === 'payloads'" class="glass-panel" style="overflow-y: auto;" x-cloak>
-                <div class="payloads-grid">
-                    <template x-if="payloadList.length === 0">
+                <div class="payloads-grid" :style="{ opacity: payloadsLoading ? 0.6 : 1, transition: 'opacity 0.2s ease' }">
+                    <template x-if="payloadList.length === 0 && !payloadsLoading">
                         <p style="color: var(--text-secondary); grid-column: 1 / -1;">Put your payloads in `/www/payloads` or mount your USB device to `/www/usb`</p>
                     </template>
                     <template x-for="item in payloadList" :key="item.path">
@@ -166,10 +168,10 @@
                             <input type="checkbox" x-model="logFilters.pppwn" @change="renderLogs"> pppwn
                         </label>
                         <label class="log-filter-item">
-                            <input type="checkbox" x-model="logFilters.pppoe" @change="renderLogs"> pppoe-server
+                            <input type="checkbox" x-model="logFilters.pppd" @change="renderLogs"> pppd
                         </label>
                         <label class="log-filter-item">
-                            <input type="checkbox" x-model="logFilters.pppd" @change="renderLogs"> pppd
+                            <input type="checkbox" x-model="logFilters.pppoe" @change="renderLogs"> pppoe-server
                         </label>
                     </div>
                 </div>

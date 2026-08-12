@@ -62,6 +62,7 @@ chmod +x /usr/sbin/pppwn
 chmod +x /etc/init.d/pppoe-server
 chmod +x /etc/init.d/pw
 chmod +x /www/cgi-bin/pw.cgi
+chmod 600 /etc/ppp/pap-secrets /etc/ppp/chap-secrets
 
 # 赋予固件版本列表和载荷读取权限
 chmod -R 777 /root/stage1 /root/stage2 /root/version

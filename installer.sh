@@ -103,6 +103,7 @@ installer_setup(){
         mv -f ${dir_root}www/assets /www/
 
         chmod +x /etc/init.d/pppoe-server /www/cgi-bin/pw.cgi
+        chmod 600 /etc/ppp/pap-secrets /etc/ppp/chap-secrets
 
         uci del_list firewall.@zone[0].device='ppp+'
         uci add_list firewall.@zone[0].device='ppp+'
