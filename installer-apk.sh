@@ -5,7 +5,7 @@ apk add unzip curl rp-pppoe-common rp-pppoe-server
 
 echo ">>> [2/7] 下载原版 PPPwn_ow 网页前端和配置文件..."
 cd /tmp
-wget -O pppwn_ow.zip https://github.com/CodeInvers3/PPPwn_ow/archive/refs/heads/main.zip
+wget -O pppwn_ow.zip https://github.com/cbmland/PPPwn_ow/archive/refs/heads/main.zip
 unzip -o pppwn_ow.zip
 cd PPPwn_ow-main
 
