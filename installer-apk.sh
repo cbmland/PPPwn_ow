@@ -80,5 +80,5 @@ rm -rf PPPwn_ow-main pppwn_ow.zip pppwn_update pppwn-musl.zip
 
 echo "=========================================================="
 echo "🎯 PPPwn 环境终极修复版部署完成！"
-echo "👉 请在电脑浏览器访问：http://192.168.1.1/pppwn.html"
+echo "👉 请在电脑浏览器访问：http://ip_address/pppwn.html"
 echo "=========================================================="
