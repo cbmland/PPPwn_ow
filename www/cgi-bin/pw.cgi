@@ -181,22 +181,23 @@ case "$task" in
 
         echo "{"
 
-        current_version=$(cat /root/version)
-        latest_version=$(wget -qO- "https://raw.githubusercontent.com/CodeInvers3/PPPwn_ow/main/version" 2>/dev/null)
+        # current_version=$(cat /root/version)
+        # latest_version=$(wget -qO- "https://raw.githubusercontent.com/CodeInvers3/PPPwn_ow/main/version" 2>/dev/null)
 
         echo "\"stored_token\":\"$stoken\","
         echo "\"chipname\":\"$(uname -m)\","
         echo "\"path\":\"$(uci get pw.@params[0].path)\","
 
-        if [ "$latest_version" -gt "$current_version" ]; then
-            if ! [ -f /tmp/updater.sh ]; then
-                "$(wget -O /tmp/updater.sh https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/refs/heads/master/files/updater.sh)"
-                chmod +x /tmp/updater.sh
-            fi
-            echo "\"update\":true,"
-        else
-            echo "\"update\":false,"
-        fi
+        # if [ "$latest_version" -gt "$current_version" ]; then
+        #     if ! [ -f /tmp/updater.sh ]; then
+        #         "$(wget -O /tmp/updater.sh https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/refs/heads/master/files/updater.sh)"
+        #         chmod +x /tmp/updater.sh
+        #     fi
+        #     echo "\"update\":true,"
+        # else
+        #     echo "\"update\":false,"
+        # fi
+        echo "\"update\":false,"
 
         if pgrep pppoe-server > /dev/null; then
             echo "\"pppoe\":true,"
