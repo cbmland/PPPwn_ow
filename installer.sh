@@ -130,31 +130,31 @@ installer_setup(){
         read -p "Select a option: " optdwn
         case $optdwn in
             1)
-                repo_ref="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/stored/aarch64-linux-musl.tar.gz"
+                repo_ref="https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/aarch64-linux-musl.zip"
                 break
                 ;;
             2)
-                repo_ref="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/stored/arm-linux-musleabi(cortex_a7).tar.gz"
+                repo_ref="https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/arm-linux-musleabi.cortex_a7.zip"
                 break
                 ;;
             3)
-                repo_ref="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/stored/arm-linux-musleabi(pi_zero_w).tar.gz"
+                repo_ref="https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/arm-linux-musleabi.pi_zero_w.zip"
                 break
                 ;;
             4)
-                repo_ref="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/stored/arm-linux-musleabi(mpcorenovfp).tar.gz"
+                repo_ref="https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/arm-linux-musleabi.mpcorenovfp.zip"
                 break
                 ;;
             5)
-                repo_ref="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/stored/x86_64-linux-musl.tar.gz"
+                repo_ref="https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/x86_64-linux-musl.zip"
                 break
                 ;;
             6)
-                repo_ref="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/stored/mipsel-linux-musl.tar.gz"
+                repo_ref="https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/mipsel-linux-musl.zip"
                 break
                 ;;
             7)
-                repo_ref="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/stored/mips-linux-musl.tar.gz"
+                repo_ref="https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/mips-linux-musl.zip"
                 break
                 ;;
             *)
@@ -225,9 +225,22 @@ installer_setup(){
             timeout=0
         fi
 
-        wget -O ${dir_root}pppwn.tar.gz $repo_ref
-        tar -xvzf ${dir_root}pppwn.tar.gz -C $dir_root
-        rm ${dir_root}pppwn.tar.gz
+        case "$repo_ref" in
+            *.zip)
+                wget -O ${dir_root}pppwn.zip "$repo_ref"
+                unzip -o ${dir_root}pppwn.zip pppwn.tar.gz -d $dir_root
+                tar -xvzf ${dir_root}pppwn.tar.gz -C $dir_root
+                rm -f ${dir_root}pppwn.zip ${dir_root}pppwn.tar.gz
+                ;;
+            *.tar.gz)
+                wget -O ${dir_root}pppwn.tar.gz "$repo_ref"
+                tar -xvzf ${dir_root}pppwn.tar.gz -C $dir_root
+                rm -f ${dir_root}pppwn.tar.gz
+                ;;
+            *)
+                wget -O ${dir_root}pppwn "$repo_ref"
+                ;;
+        esac
 
         mv -f ${dir_root}etc/config/pw /etc/config
 

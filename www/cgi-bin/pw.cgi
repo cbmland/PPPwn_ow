@@ -124,19 +124,19 @@ case "$task" in
 
         repo_refs=""
         if [ "$option" = "aarch64-linux-musl" ]; then
-            repo_refs="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/stored/aarch64-linux-musl.tar.gz"
+            repo_refs="https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/aarch64-linux-musl.zip"
         elif [ "$option" = "arm-linux-musleabi(cortex_a7)" ]; then
-            repo_refs="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/stored/arm-linux-musleabi(cortex_a7).tar.gz"
+            repo_refs="https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/arm-linux-musleabi.cortex_a7.zip"
         elif [ "$option" = "arm-linux-musleabi(pi_zero_w)" ]; then
-            repo_refs="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/stored/arm-linux-musleabi(pi_zero_w).tar.gz"
+            repo_refs="https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/arm-linux-musleabi.pi_zero_w.zip"
         elif [ "$option" = "arm-linux-musleabi(mpcorenovfp)" ]; then
-            repo_refs="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/stored/arm-linux-musleabi(mpcorenovfp).tar.gz"
+            repo_refs="https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/arm-linux-musleabi.mpcorenovfp.zip"
         elif [ "$option" = "x86_64-linux-musl" ]; then
-            repo_refs="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/stored/x86_64-linux-musl.tar.gz"
+            repo_refs="https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/x86_64-linux-musl.zip"
         elif [ "$option" = "mipsel-linux-musl" ]; then
-            repo_refs="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/stored/mipsel-linux-musl.tar.gz"
+            repo_refs="https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/mipsel-linux-musl.zip"
         elif [ "$option" = "mips-linux-musl" ]; then
-            repo_refs="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/stored/mips-linux-musl.tar.gz"
+            repo_refs="https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/mips-linux-musl.zip"
         elif [ "$option" = "custom-aarch64-linux-musl" ]; then
             repo_refs="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/compiled/aarch64-linux-musl/pppwn"
         elif [ "$option" = "custom-arm-linux-musleabi_cortex_a7" ]; then
@@ -153,25 +153,57 @@ case "$task" in
             repo_refs="https://raw.githubusercontent.com/CodeInvers3/codeinvers3.github.io/master/custom/compiled/x86_64-linux-musl/pppwn"
         fi
 
-        if [[ "$repo_refs" =~ tar\.gz$ ]]; then
-            cd /tmp/
-            if wget -O pppwn.tar.gz $repo_refs; then
-                "$(tar -xzvf pppwn.tar.gz)"
-                "$(rm pppwn.tar.gz)"
-                "$(chmod +x pppwn)"
-                "$(mv pppwn /usr/sbin)"
-                echo "{\"output\":\"PPPwn installed\",\"pppwn\":true}"
-                exit 0
-            else
-                echo "{\"output\":\"Cannot to get repos: $repo_refs\"}"
-                exit 1
-            fi
-        else
-            "$(wget -O /usr/sbin/pppwn $repo_refs)"
-            "$(chmod +x /usr/sbin/pppwn)"
-            echo "{\"output\":\"PPPwn installed\",\"pppwn\":true}"
-            exit 0
-        fi
+        case "$repo_refs" in
+            *.zip)
+                cd /tmp/
+                if wget -O pppwn.zip "$repo_refs"; then
+                    if unzip -o pppwn.zip pppwn.tar.gz; then
+                        if tar -xzvf pppwn.tar.gz; then
+                            rm -f pppwn.zip pppwn.tar.gz
+                            chmod +x pppwn
+                            mv pppwn /usr/sbin
+                            echo "{\"output\":\"PPPwn installed\",\"pppwn\":true}"
+                            exit 0
+                        else
+                            rm -f pppwn.zip pppwn.tar.gz
+                            echo "{\"output\":\"Failed to extract pppwn.tar.gz\"}"
+                            exit 1
+                        fi
+                    else
+                        rm -f pppwn.zip
+                        echo "{\"output\":\"Failed to unzip pppwn.zip\"}"
+                        exit 1
+                    fi
+                else
+                    echo "{\"output\":\"Cannot to get repos: $repo_refs\"}"
+                    exit 1
+                fi
+                ;;
+            *.tar.gz)
+                cd /tmp/
+                if wget -O pppwn.tar.gz "$repo_refs"; then
+                    tar -xzvf pppwn.tar.gz
+                    rm -f pppwn.tar.gz
+                    chmod +x pppwn
+                    mv pppwn /usr/sbin
+                    echo "{\"output\":\"PPPwn installed\",\"pppwn\":true}"
+                    exit 0
+                else
+                    echo "{\"output\":\"Cannot to get repos: $repo_refs\"}"
+                    exit 1
+                fi
+                ;;
+            *)
+                if wget -O /usr/sbin/pppwn "$repo_refs"; then
+                    chmod +x /usr/sbin/pppwn
+                    echo "{\"output\":\"PPPwn installed\",\"pppwn\":true}"
+                    exit 0
+                else
+                    echo "{\"output\":\"Cannot to get repos: $repo_refs\"}"
+                    exit 1
+                fi
+                ;;
+        esac
 
     ;;
     "state")
