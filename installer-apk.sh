@@ -1,4 +1,5 @@
 #!/bin/sh
+# curl -sSL https://raw.githubusercontent.com/cbmland/PPPwn_ow/refs/heads/main/installer-apk.sh | sh
 echo ">>> [1/7] 开始更新系统源并安装必要的依赖 (基于 apk)..."
 #apk update
 apk add unzip curl rp-pppoe-common rp-pppoe-server
