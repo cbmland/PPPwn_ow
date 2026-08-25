@@ -1,6 +1,6 @@
 #!/bin/sh
 echo ">>> [1/7] 开始更新系统源并安装必要的依赖 (基于 apk)..."
-apk update
+#apk update
 apk add unzip curl rp-pppoe-common rp-pppoe-server
 
 echo ">>> [2/7] 下载原版 PPPwn_ow 网页前端和配置文件..."
@@ -45,20 +45,20 @@ cp -r stage2 /etc/pppwn/
 echo ">>> [5/7] 正在修复启动脚本中的 Bash 语法不兼容 Bug (Ash 环境替换)..."
 sed -i 's/if \[\[ "$result" == \*"\\\[\\+\] Done\\!"\* \]\]; then/if echo "$result" | grep -Fq "[+] Done!"; then/g' /etc/init.d/pw
 
-echo ">>> [6/7] 正在下载最新的底层攻击武器 (xfangfang v1.1.0 mipsel-musl)..."
-cd /tmp
-wget -O pppwn-musl.zip https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/mipsel-linux-musl.zip
-mkdir -p pppwn_update
-unzip -o pppwn-musl.zip -d pppwn_update
-cd pppwn_update
+# echo ">>> [6/7] 正在下载最新的底层攻击武器 (xfangfang v1.1.0 mipsel-musl)..."
+# cd /tmp
+# wget -O pppwn-musl.zip https://github.com/xfangfang/PPPwn_cpp/releases/download/1.1.0/mipsel-linux-musl.zip
+# mkdir -p pppwn_update
+# unzip -o pppwn-musl.zip -d pppwn_update
+# cd pppwn_update
 
 # 拆解 .tar.gz 套娃并安装核心程序
-tar -xzf pppwn.tar.gz
-mv pppwn /usr/sbin/pppwn
+# tar -xzf pppwn.tar.gz
+# mv pppwn /usr/sbin/pppwn
 
 echo ">>> [7/7] 正在赋予系统权限、清理垃圾并启动服务..."
 # 赋予核心程序、服务脚本最高执行权限
-chmod +x /usr/sbin/pppwn
+# chmod +x /usr/sbin/pppwn
 chmod +x /etc/init.d/pppoe-server
 chmod +x /etc/init.d/pw
 chmod +x /www/cgi-bin/pw.cgi
